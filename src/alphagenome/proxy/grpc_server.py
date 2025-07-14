@@ -1,6 +1,7 @@
 import grpc
 from concurrent import futures
 import logging
+import os
 
 from alphagenome.protos.alphagenome.protos import dna_model_service_pb2_grpc
 from alphagenome.protos.alphagenome.protos import dna_model_pb2
@@ -61,7 +62,12 @@ class DnaModelService(dna_model_service_pb2_grpc.DnaModelServiceServicer):
             ontology_terms = []
 
         # 4. Call AlphaGenome API
-        model = dna_client.create('MyAPIKey')
+        api_key = os.environ.get('ALPHAGENOME_API_KEY')
+        if not api_key:
+            context.set_code(grpc.StatusCode.UNAUTHENTICATED)
+            context.set_details('ALPHAGENOME_API_KEY environment variable is not set. Please set it with your AlphaGenome API key.')
+            return
+        model = dna_client.create(api_key)
         outputs = model.predict_variant(
             interval=interval,
             variant=variant,
