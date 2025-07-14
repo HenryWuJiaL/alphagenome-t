@@ -67,6 +67,7 @@ class DnaModelService(dna_model_service_pb2_grpc.DnaModelServiceServicer):
             context.set_code(grpc.StatusCode.UNAUTHENTICATED)
             context.set_details('ALPHAGENOME_API_KEY environment variable is not set. Please set it with your AlphaGenome API key.')
             return
+        print(f"DEBUG: Attempting to use API Key: {api_key}")
         model = dna_client.create(api_key)
         outputs = model.predict_variant(
             interval=interval,
